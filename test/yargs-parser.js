@@ -413,6 +413,27 @@ describe('yargs-parser', function () {
       argv.should.have.property('foo').and.deep.equal('banana')
     })
 
+    it('should use specified cli value, but retain default values for other keys in a nested option', function () {
+      var argv = parser(['--nested.first', 'one'], {
+        alias: {
+          z: 'zoom',
+          f: 'nested.first',
+          s: 'nested.second'
+        },
+        config: ['settings'],
+        default: {
+          settings: jsonPath,
+          foo: 'banana'
+        }
+      })
+
+      argv.should.have.property('herp', 'derp')
+      argv.should.have.property('zoom', 55)
+      argv.should.have.property('s', 'last but not least!')
+      argv.should.have.property('f', 'one')
+      argv.should.have.property('nested').and.deep.equal({'first': 'one', 'second': 'last but not least!'})
+    })
+
     it('should load options and values from a file when config is used', function () {
       var argv = parser([ '--settings', jsonPath, '--foo', 'bar' ], {
         alias: {

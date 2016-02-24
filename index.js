@@ -401,11 +401,21 @@ function parse (args, opts) {
           }
 
           Object.keys(config).forEach(function (key) {
+            var configValue = config[key]
+
             // setting arguments via CLI takes precedence over
             // values within the config file.
-            if (argv[key] === undefined || (flags.defaulted[key])) {
+            if (typeof configValue === 'object') {
+              Object.keys(configValue).forEach(function (k) {
+                var v = configValue[k]
+                if (argv[key][k] === undefined || (flags.defaulted[key + '.' + k])) {
+                  delete argv[key][k]
+                  setArg(key + '.' + k, v)
+                }
+              })
+            } else if (argv[key] === undefined || (flags.defaulted[key])) {
               delete argv[key]
-              setArg(key, config[key])
+              setArg(key, configValue)
             }
           })
         } catch (ex) {
